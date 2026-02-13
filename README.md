@@ -42,4 +42,4 @@ $ bin/dev
 # 📝 License
 
 #### Copyright © 2026 [M.V.Harish Kumar](https://github.com/harishtpj). <br>
-#### This project is [MIT](https://github.com/harishtpj/CineMood/blob/main/LICENSE) licensed.
+#### This project is [MIT](https://github.com/harishtpj/CineMood/blob/master/LICENSE) licensed.
