@@ -7,10 +7,10 @@ class MovieService
         genre_ids = client.generate_content({contents: {
                 role: 'user',
                 parts: { text: prompt }
-            }}, model: 'gemini-3-flash-preview').dig('candidates', 0, 'content', 'parts', 0, 'text').strip
+        }}, model: 'gemini-2.5-flash-lite').dig('candidates', 0, 'content', 'parts', 0, 'text').strip
 
         tmdb_url = "https://api.themoviedb.org/3/discover/movie"
-        resp = HTTParty.get(tmdb_url, query: {
+        resp = HTTParty.get(tmdb_url, timeout: 30, query: {
             api_key: ENV['TMDB_API_KEY'],
             with_genres: genre_ids,
             sort_by: 'popularity.desc'

@@ -6,4 +6,6 @@ Rails.application.routes.draw do
 
   root 'movies#index'
   post '/recommend', to: 'movies#recommend'
+  get '/favourites', to: 'favourites#index'
+  resource :favourites, only: [:create, :destroy]
 end
