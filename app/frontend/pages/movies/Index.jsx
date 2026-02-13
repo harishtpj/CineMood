@@ -1,84 +1,137 @@
 import { router } from '@inertiajs/core';
-import { useForm, Link } from '@inertiajs/react';
+import { useForm } from '@inertiajs/react';
+import { useState, useEffect } from 'react';
+import Layout from '../../components/Layout';
+import SearchBar from '../../components/SearchBar';
+import MovieCard from '../../components/MovieCard';
+import EmptyState from '../../components/EmptyState';
+import LoadingSpinner from '../../components/LoadingSpinner';
 
-export default function Home({ movies, fav_ids, fav_loc }) {
-  const { data, setData, post, processing } = useForm({ mood: '' });
+export default function Index({ movies = [], fav_ids = [], initial_mood = '', error = null }) {
+  const { data, setData, post, processing } = useForm({ mood: initial_mood });
+  const [isSearching, setIsSearching] = useState(false);
 
-  const submit = (e) => {
-    e.preventDefault();
+  // Handle search submission
+  const handleSubmit = (e) => {
+    if (e) e.preventDefault();
+    setIsSearching(true);
     post('/recommend', { 
       preserveState: true, 
-      preserveScroll: true, 
-      replace: true 
+      preserveScroll: false,
+      onFinish: () => setIsSearching(false)
     });
   };
 
+  // Toggle favorite status
   const toggleFavorite = (movie) => {
-    if (fav_ids.includes(movie.id)) {
-      router.delete(`${fav_loc}/${movie.id}`, { preserveScroll: true });
+    const isFavourite = fav_ids.includes(movie.id);
+    
+    if (isFavourite) {
+      // Remove from favorites using movie_id
+      router.delete(`/favourites/by_movie/${movie.id}`, { 
+        preserveScroll: true,
+        preserveState: true,
+        onSuccess: () => {
+          // Reload the page props to update fav_ids
+          router.reload({ only: ['fav_ids'] });
+        }
+      });
     } else {
-      router.post(fav_loc, movie, { preserveScroll: true });
+      // Add to favorites
+      router.post('/favourites', {
+        movie_id: movie.id,
+        title: movie.title,
+        poster_path: movie.poster_path
+      }, { 
+        preserveScroll: true,
+        preserveState: true,
+        onSuccess: () => {
+          // Reload the page props to update fav_ids
+          router.reload({ only: ['fav_ids'] });
+        }
+      });
     }
   };
 
+  // Show error notification if present
+  useEffect(() => {
+    if (error) {
+      const timeout = setTimeout(() => {
+        router.reload({ only: ['error'] });
+      }, 5000);
+      return () => clearTimeout(timeout);
+    }
+  }, [error]);
+
   return (
-    <div className="min-h-screen bg-slate-900 text-white p-10 font-sans">
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-4xl font-bold">CineMood AI 🎬</h1>
-        <Link href={fav_loc} className="bg-yellow-500 hover:bg-yellow-600 text-black px-4 py-2 rounded font-bold">
-          View Favorites ({fav_ids.length})
-        </Link>
-      </div>
-      
-      <form onSubmit={submit} className="max-w-xl mx-auto mb-12 flex gap-2">
-        <input 
-          type="text" 
+    <Layout title="🎬 CineMood AI" favCount={fav_ids.length}>
+      {/* Error Banner */}
+      {error && (
+        <div className="mb-6 bg-red-500/20 border border-red-500 text-red-200 px-4 py-3 rounded-lg flex items-center gap-3">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+          </svg>
+          <span>{error}</span>
+        </div>
+      )}
+
+      {/* Search Section */}
+      <div className="mb-12">
+        <div className="text-center mb-8">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-purple-400 via-pink-400 to-purple-400 bg-clip-text text-transparent">
+            Discover Movies That Match Your Mood
+          </h2>
+          <p className="text-slate-400 text-lg">
+            Tell us how you're feeling, and we'll find the perfect movies for you
+          </p>
+        </div>
+
+        <SearchBar 
           value={data.mood}
-          onChange={e => setData('mood', e.target.value)}
-          placeholder="How are you feeling today?"
-          className="flex-1 p-4 rounded-lg bg-slate-800 border border-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+          onChange={(value) => setData('mood', value)}
+          onSubmit={handleSubmit}
+          processing={processing || isSearching}
         />
-        <button 
-          disabled={processing}
-          className="bg-blue-600 hover:bg-blue-700 px-6 py-4 rounded-lg font-bold transition-colors"
-        >
-          {processing ? '...' : 'Go'}
-        </button>
-      </form>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {movies.map(movie => (
-          <div key={movie.id} className="bg-slate-800 rounded-xl overflow-hidden shadow-lg border border-slate-700 group relative">
-            <img 
-              src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`} 
-              alt={movie.title} 
-              className="w-full h-96 object-cover" 
-            />
-            
-            {/* Star Button Overlay */}
-            <button 
-              onClick={() => toggleFavorite(movie)}
-              className="absolute top-2 right-2 p-2 rounded-full bg-black/50 hover:bg-black/70 transition"
-            >
-              <svg 
-                xmlns="http://www.w3.org/2000/svg" 
-                fill={fav_ids.includes(movie.id) ? "gold" : "none"} 
-                viewBox="0 0 24 24" 
-                strokeWidth={1.5} 
-                stroke={fav_ids.includes(movie.id) ? "gold" : "currentColor"} 
-                className="w-8 h-8"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.545.044.757.74.34 1.108l-4.148 3.658a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.148-3.658c-.417-.368-.205-1.064.34-1.108l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" />
-              </svg>
-            </button>
-
-            <div className="p-4">
-              <h2 className="text-xl font-bold truncate">{movie.title}</h2>
-              <p className="text-slate-400 text-sm mt-2 line-clamp-3">{movie.overview}</p>
-            </div>
-          </div>
-        ))}
       </div>
-    </div>
+
+      {/* Results Section */}
+      {isSearching || processing ? (
+        <LoadingSpinner message="Finding perfect movies for your mood..." />
+      ) : movies.length > 0 ? (
+        <div>
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-2xl font-bold">
+              Recommended for "{data.mood}"
+            </h3>
+            <span className="text-slate-400">
+              {movies.length} movie{movies.length !== 1 ? 's' : ''} found
+            </span>
+          </div>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {movies.map(movie => (
+              <MovieCard 
+                key={movie.id}
+                movie={movie}
+                isFavourite={fav_ids.includes(movie.id)}
+                onToggleFavourite={toggleFavorite}
+              />
+            ))}
+          </div>
+        </div>
+      ) : data.mood ? (
+        <EmptyState 
+          icon="🔍"
+          title="No movies found"
+          message={`We couldn't find any movies matching "${data.mood}". Try a different mood!`}
+        />
+      ) : (
+        <EmptyState 
+          icon="🎭"
+          title="Ready to find your perfect movie?"
+          message="Share your mood above and let AI work its magic to recommend movies just for you!"
+        />
+      )}
+    </Layout>
   );
 }

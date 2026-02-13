@@ -3,17 +3,27 @@ class MoviesController < ApplicationController
     render inertia: 'movies/Index', props: { 
       movies: [],
       fav_ids: cur_user_favs,
-      fav_loc: favourites_path
+      initial_mood: params[:mood] || ''
     }
   end
 
   def recommend
-    movies = MovieService.get_recommendations(params[:mood])
-    render inertia: 'movies/Index', props: { 
-      movies: movies, 
-      fav_ids: cur_user_favs,
-      fav_loc: favourites_path
-    }
+    begin
+      movies = MovieService.get_recommendations(params[:mood])
+      render inertia: 'movies/Index', props: { 
+        movies: movies || [], 
+        fav_ids: cur_user_favs,
+        initial_mood: params[:mood]
+      }
+    rescue => e
+      Rails.logger.error "Movie recommendation error: #{e.message}"
+      render inertia: 'movies/Index', props: { 
+        movies: [],
+        fav_ids: cur_user_favs,
+        initial_mood: params[:mood],
+        error: 'Failed to get recommendations. Please try again.'
+      }
+    end
   end
 
   private

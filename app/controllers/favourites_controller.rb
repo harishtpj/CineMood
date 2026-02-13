@@ -1,22 +1,33 @@
 class FavouritesController < ApplicationController
   def index
-    favs = Favourite.where(session_id: session[:user_uuid])
-    render inertia: 'movies/Favourites', props: { favourites: favs }
+    favs = Favourite.where(session_id: session[:user_uuid]).order(created_at: :desc)
+    render inertia: 'movies/Favourites', props: { 
+      favourites: favs.as_json(only: [:id, :movie_id, :title, :poster_path, :created_at])
+    }
   end
 
   def create
-    Favourite.create!(
+    isExisting = Favourite.find_by(
       movie_id: params[:movie_id],
-      title: params[:title],
-      poster_path: params[:poster_path],
-      session_id: session[:user_uuid],
+      session_id: session[:user_uuid]
     )
-    redirect_to root_path
+    
+    unless isExisting
+      Favourite.create!(
+        movie_id: params[:movie_id],
+        title: params[:title],
+        poster_path: params[:poster_path],
+        session_id: session[:user_uuid]
+      )
+    end
+    
+    head :ok
   end
 
-  def destroy(id)
-    fav = Favourite.find_by(id: id, session_id: session[:user_uuid])
-    fav.destroy if fav
-    redirect_to root_path
+  def destroy
+    fav = Favourite.find_by(id: params[:id], session_id: session[:user_uuid])
+    fav&.destroy
+    
+    head :ok
   end
 end
