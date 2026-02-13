@@ -62,3 +62,8 @@ end
 gem "inertia_rails", "~> 3.17"
 
 gem "vite_rails", "~> 3.0"
+
+gem "httparty", "~> 0.24.2"
+gem "dotenv-rails", "~> 3.2"
+
+gem "ruby-gemini-ai", "~> 0.1.1"
