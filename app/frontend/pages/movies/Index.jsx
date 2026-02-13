@@ -94,7 +94,7 @@ export default function Index({ movies = [], fav_ids = [], initial_mood = '', er
       {/* Search Section */}
       <div className="mb-12">
         <div className="text-center mb-8">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-purple-400 via-pink-400 to-purple-400 bg-clip-text text-transparent">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-teal-400 via-indigo-400 to-pink-400 bg-clip-text text-transparent">
             Discover Movies That Match Your Mood
           </h2>
           <p className="text-slate-400 text-lg">

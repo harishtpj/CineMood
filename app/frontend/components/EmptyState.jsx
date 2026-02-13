@@ -22,7 +22,7 @@ export default function EmptyState({
       {showAction && (
         <Link 
           href={actionHref}
-          className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 px-6 py-3 rounded-full font-semibold transition-all transform hover:scale-105 shadow-lg"
+          className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-700 hover:via-purple-700 hover:to-pink-700 px-6 py-3 rounded-full font-semibold transition-all transform hover:scale-105 shadow-lg shadow-purple-500/30"
         >
           {actionText}
         </Link>

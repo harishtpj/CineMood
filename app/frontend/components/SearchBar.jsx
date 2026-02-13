@@ -1,12 +1,12 @@
 import { useState } from 'react';
 
 const moodSuggestions = [
-  { emoji: '😊', mood: 'happy and uplifting', color: 'from-yellow-500 to-orange-500' },
-  { emoji: '😢', mood: 'sad and emotional', color: 'from-blue-500 to-indigo-500' },
-  { emoji: '😨', mood: 'scary and thrilling', color: 'from-red-500 to-purple-500' },
+  { emoji: '😊', mood: 'happy and uplifting', color: 'from-amber-500 to-orange-500' },
+  { emoji: '😢', mood: 'sad and emotional', color: 'from-blue-500 to-indigo-600' },
+  { emoji: '😨', mood: 'scary and thrilling', color: 'from-red-600 to-purple-600' },
   { emoji: '😂', mood: 'funny and comedic', color: 'from-green-500 to-teal-500' },
   { emoji: '💕', mood: 'romantic and sweet', color: 'from-pink-500 to-rose-500' },
-  { emoji: '🤔', mood: 'thoughtful and mysterious', color: 'from-slate-500 to-gray-500' },
+  { emoji: '🤔', mood: 'thoughtful and mysterious', color: 'from-indigo-500 to-purple-600' },
 ];
 
 export default function SearchBar({ value, onChange, onSubmit, processing }) {
@@ -36,7 +36,7 @@ export default function SearchBar({ value, onChange, onSubmit, processing }) {
               onBlur={() => setTimeout(() => setIsFocused(false), 200)}
               placeholder="How are you feeling today? (e.g., adventurous, melancholic, excited...)"
               className={`w-full p-4 pl-12 rounded-xl bg-slate-800/50 backdrop-blur-sm border-2 ${
-                isFocused ? 'border-purple-500' : 'border-slate-700'
+                isFocused ? 'border-indigo-500 ring-2 ring-indigo-500/20' : 'border-slate-700'
               } text-white placeholder-slate-400 focus:outline-none transition-all duration-200 shadow-lg`}
               disabled={processing}
             />
@@ -58,7 +58,7 @@ export default function SearchBar({ value, onChange, onSubmit, processing }) {
             className={`px-8 py-4 rounded-xl font-bold transition-all duration-200 transform hover:scale-105 shadow-lg ${
               processing || !value.trim()
                 ? 'bg-slate-700 text-slate-500 cursor-not-allowed'
-                : 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white'
+                : 'bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-700 hover:via-purple-700 hover:to-pink-700 text-white shadow-purple-500/30'
             }`}
           >
             {processing ? (
