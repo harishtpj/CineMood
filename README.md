@@ -1,24 +1,45 @@
-# README
+# 📽️ CineMood
+A movie suggestion web application that recommends films based on your current mood and preferences.
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+# ⚙️ Tech Stack
+- **Backend**: Ruby on Rails with PostgreSQL
+- **Frontend**: React.js with TailwindCSS
+- **Integration**: Inertia.js
 
-Things you may want to cover:
+# 🌟 Features
+- Mood-based movie recommendations using Google Gemini AI API
+- Feature for storing favourites
+- Highly interactive and modular design suited for modern web users
 
-* Ruby version
+# 📃 Prerequisites
+This project requires:
+1. Ruby (+ Rails related packages)
+2. PostgreSQL
+3. NodeJS
 
-* System dependencies
+# 🚀 Getting Started
+1. Clone the repository
+```sh
+$ git clone https://github.com/harishtpj/CineMood
+```
+2. Install dependencies
+```sh
+$ bundle install && npm install
+```
+3. Setup database
+```sh
+$ bin/rails db:prepare
+```
+or you could instead use the setup script for development purposes, which takes care of the above configurations
+```sh
+$ bin/setup
+```
+4. Start the development server
+```sh
+$ bin/dev
+```
 
-* Configuration
+# 📝 License
 
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+#### Copyright © 2026 [M.V.Harish Kumar](https://github.com/harishtpj). <br>
+#### This project is [MIT](https://github.com/harishtpj/CineMood/blob/main/LICENSE) licensed.
