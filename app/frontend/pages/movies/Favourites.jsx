@@ -13,11 +13,8 @@ export default function Favourites({ favourites = [] }) {
       
       router.delete(`/favourites/${favourite.id}`, {
         preserveState: false,
-        onFinish: () => setRemovingId(null),
-        onError: () => {
-          alert('Failed to remove from favorites. Please try again.');
-          setRemovingId(null);
-        }
+        preserveScroll: true,
+        onFinish: () => setRemovingId(null)
       });
     }
   };

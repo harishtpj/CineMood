@@ -21,13 +21,23 @@ class FavouritesController < ApplicationController
       )
     end
     
-    head :ok
+    redirect_back fallback_location: root_path
   end
 
   def destroy
     fav = Favourite.find_by(id: params[:id], session_id: session[:user_uuid])
     fav&.destroy
     
-    head :ok
+    redirect_back fallback_location: root_path
+  end
+
+  def destroy_by_movie
+    fav = Favourite.find_by(
+      movie_id: params[:movie_id],
+      session_id: session[:user_uuid]
+    )
+    fav&.destroy
+    
+    redirect_back fallback_location: root_path
   end
 end

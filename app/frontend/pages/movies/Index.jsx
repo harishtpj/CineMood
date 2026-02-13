@@ -10,6 +10,12 @@ import LoadingSpinner from '../../components/LoadingSpinner';
 export default function Index({ movies = [], fav_ids = [], initial_mood = '', error = null }) {
   const { data, setData, post, processing } = useForm({ mood: initial_mood });
   const [isSearching, setIsSearching] = useState(false);
+  const [localFavIds, setLocalFavIds] = useState(fav_ids);
+
+  // Sync local state when props change
+  useEffect(() => {
+    setLocalFavIds(fav_ids);
+  }, [fav_ids]);
 
   // Handle search submission
   const handleSubmit = (e) => {
@@ -24,16 +30,25 @@ export default function Index({ movies = [], fav_ids = [], initial_mood = '', er
 
   // Toggle favorite status
   const toggleFavorite = (movie) => {
-    const isFavourite = fav_ids.includes(movie.id);
+    const isFavourite = localFavIds.includes(movie.id);
     
+    // Optimistically update UI
+    if (isFavourite) {
+      setLocalFavIds(localFavIds.filter(id => id !== movie.id));
+    } else {
+      setLocalFavIds([...localFavIds, movie.id]);
+    }
+    
+    // Send request to backend
     if (isFavourite) {
       // Remove from favorites using movie_id
       router.delete(`/favourites/by_movie/${movie.id}`, { 
         preserveScroll: true,
         preserveState: true,
-        onSuccess: () => {
-          // Reload the page props to update fav_ids
-          router.reload({ only: ['fav_ids'] });
+        only: ['fav_ids'],
+        onError: () => {
+          // Revert on error
+          setLocalFavIds(fav_ids);
         }
       });
     } else {
@@ -45,9 +60,10 @@ export default function Index({ movies = [], fav_ids = [], initial_mood = '', er
       }, { 
         preserveScroll: true,
         preserveState: true,
-        onSuccess: () => {
-          // Reload the page props to update fav_ids
-          router.reload({ only: ['fav_ids'] });
+        only: ['fav_ids'],
+        onError: () => {
+          // Revert on error
+          setLocalFavIds(fav_ids);
         }
       });
     }
@@ -64,7 +80,7 @@ export default function Index({ movies = [], fav_ids = [], initial_mood = '', er
   }, [error]);
 
   return (
-    <Layout title="🎬 CineMood AI" favCount={fav_ids.length}>
+    <Layout title="🎬 CineMood AI" favCount={localFavIds.length}>
       {/* Error Banner */}
       {error && (
         <div className="mb-6 bg-red-500/20 border border-red-500 text-red-200 px-4 py-3 rounded-lg flex items-center gap-3">
@@ -113,7 +129,7 @@ export default function Index({ movies = [], fav_ids = [], initial_mood = '', er
               <MovieCard 
                 key={movie.id}
                 movie={movie}
-                isFavourite={fav_ids.includes(movie.id)}
+                isFavourite={localFavIds.includes(movie.id)}
                 onToggleFavourite={toggleFavorite}
               />
             ))}

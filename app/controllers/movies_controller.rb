@@ -8,6 +8,11 @@ class MoviesController < ApplicationController
   end
 
   def recommend
+    unless params[:mood].present?
+      redirect_to root_path
+      return
+    end
+
     begin
       movies = MovieService.get_recommendations(params[:mood])
       render inertia: 'movies/Index', props: { 
@@ -15,8 +20,8 @@ class MoviesController < ApplicationController
         fav_ids: cur_user_favs,
         initial_mood: params[:mood]
       }
-    rescue => e
-      Rails.logger.error "Movie recommendation error: #{e.message}"
+    rescue StandardError => e
+      Rails.logger.error "Movie recommendation error: #{e.message}"    
       render inertia: 'movies/Index', props: { 
         movies: [],
         fav_ids: cur_user_favs,
